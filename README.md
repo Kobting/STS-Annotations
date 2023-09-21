@@ -59,3 +59,7 @@ the path to your installation of Steam.
         //The generated clas AutoInitialize has all the code for loading the string files based on the games current set language.
     }
     ```
+
+
+https://github.com/Kobting/STS-Annotations/assets/40338395/0ec106ac-d22a-4131-a61c-f2c13ce90d88
+
