@@ -61,5 +61,8 @@ the path to your installation of Steam.
     ```
 
 
-https://github.com/Kobting/STS-Annotations/assets/40338395/0ec106ac-d22a-4131-a61c-f2c13ce90d88
+https://github.com/Kobting/STS-Annotations/assets/40338395/7c9ecff6-300c-413f-bd3c-e226bdf81fb7
+
+
+
 
