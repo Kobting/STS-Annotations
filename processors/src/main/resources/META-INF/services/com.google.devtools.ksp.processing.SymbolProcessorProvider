@@ -1,0 +1,4 @@
+com.github.kobting.processors.CardStringProcessorProvider
+com.github.kobting.processors.PowerStringProcessorProvider
+com.github.kobting.processors.RelicStringProcessorProvider
+com.github.kobting.processors.AutoSpireInitializerProcessorProvider
