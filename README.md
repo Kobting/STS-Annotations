@@ -2,9 +2,9 @@
 
 This project is aimed at adding annotations to remove the boilerplate code required when creating a STS mod.
 
-## TODO
+## Adding to your project
 
-Figure out how to create dependencies and host them on GitHub packages, so it is easier to use this.
+https://github.com/Kobting/STS-Annotations/wiki/Adding-to-your-project
 
 ## Building
 
