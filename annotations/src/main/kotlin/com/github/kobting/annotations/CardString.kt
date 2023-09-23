@@ -9,7 +9,9 @@ annotation class CardString(
     val prefix: String,
     val name: String,
     val description: String,
-    val language: Language
+    val upgradeDescription: String = "",
+    val extendedDescriptions: Array<String> = [],
+    val language: Language = Language.ENGLISH
 )
 
 @Retention(AnnotationRetention.SOURCE)
