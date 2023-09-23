@@ -29,8 +29,8 @@ class CardStringProcessor(
     override fun createFileContents(annotations: List<KSAnnotation>): String {
         val cardStringJson = annotations.joinToString(prefix = "{\n", postfix = "\n}", separator = ",\n") { annotation ->
             with(annotation.arguments) {
-                val upgradeDescription = upgradeDescriptionOrEmpty()
                 val extendedDescription = extendedDescriptionOrEmpty()
+                val upgradeDescription = upgradeDescriptionOrEmpty(extendedDescription.isNotEmpty())
                 val hasUpgradeOrExtendedDescriptions = upgradeDescription.isNotEmpty() || extendedDescription.isNotEmpty()
                 """
                 |    "${findArgument(NAME_PREFIX).value}:${findArgument(NAME_NAME).value}": {
@@ -46,12 +46,12 @@ class CardStringProcessor(
         return cardStringJson
     }
 
-    private fun List<KSValueArgument>.upgradeDescriptionOrEmpty(): String {
+    private fun List<KSValueArgument>.upgradeDescriptionOrEmpty(addEndingComma: Boolean): String {
         val upgradeDescription = findArgument(NAME_UPGRADE_DESCRIPTION).value.toString()
         if (upgradeDescription.isEmpty()) {
             return ""
         } else {
-            return """"UPGRADE_DESCRIPTION": "$upgradeDescription","""
+            return """"UPGRADE_DESCRIPTION": "$upgradeDescription"${if (addEndingComma) "," else ""}"""
         }
     }
 

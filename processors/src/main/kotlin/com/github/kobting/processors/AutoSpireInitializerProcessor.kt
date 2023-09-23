@@ -119,7 +119,7 @@ class AutoSpireInitializerProcessor(
                 FileName.POWER_STRINGS -> PowerStrings::class.java.name
                 FileName.RELIC_STRINGS -> RelicStrings::class.java.name
             }
-            """basemod.BaseMod.loadCustomStrings(${clazz}::class.java, $localizationFuncCallStatement, "${it.fileName}"))"""
+            """basemod.BaseMod.loadCustomStringsFile(${clazz}::class.java, $localizationFuncCallStatement, "${it.fileName}"))"""
         }
         return statements.joinToString(separator = "\n")
     }
