@@ -56,8 +56,6 @@ class AutoSpireInitializerProcessor(
         if (resourceBasePath != null) {
             val supportedLanguages = findSupportedLanguagesAndFileNames(resourceBasePath, codeGenerator.generatedFile.toList())
 
-            logger.warn("SupportedLanguages: \n${supportedLanguages.joinToString(separator = "\n") { "${it.language.abbreviation}:${it.fileName.fileName}" }}")
-
             if (supportedLanguages.find { when (it.fileName) { FileName.CARD_STRINGS, FileName.POWER_STRINGS, FileName.RELIC_STRINGS -> true } } != null) {
                 autoInitializerTypeSpec.addSuperinterface(basemod.interfaces.EditStringsSubscriber::class)
 
@@ -158,7 +156,6 @@ class AutoSpireInitializerProcessor(
         val supportedLanguages = generatedFiles.asSequence().filter {
             try {
                 Language.valueOfOrError(it.parentFile.name)
-                logger.warn("FileName: ${it.name}")
                 FileName.valueOfOrError(it.name.substringBeforeLast("."))
                 true //TODO: Compare with resourceBasePath
             } catch (ex: Exception) {

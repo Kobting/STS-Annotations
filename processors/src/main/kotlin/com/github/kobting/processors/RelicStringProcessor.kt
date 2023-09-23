@@ -13,26 +13,26 @@ class RelicStringProcessor(
 ) : StringProcessor(codeGenerator, logger, options) {
 
     companion object {
-        private const val INDEX_PREFIX = 0
-        private const val INDEX_NAME = 1
-        private const val INDEX_FLAVOR = 2
-        private const val INDEX_DESCRIPTIONS = 3
+        private val NAME_PREFIX = RelicString::class.java.declaredMethods[0].name
+        private val NAME_NAME = RelicString::class.java.declaredMethods[1].name
+        private val NAME_FLAVOR = RelicString::class.java.declaredMethods[2].name
+        private val NAME_DESCRIPTIONS = RelicString::class.java.declaredMethods[3].name
     }
 
     override val fileName: String = FileName.RELIC_STRINGS.fileName
     override val annotationName: String = RelicString::class.java.name
-    override val languageArgumentIndex: Int = 4
+    override val languageArgumentName: String = "language"
 
     @Suppress("UNCHECKED_CAST")
     override fun createFileContents(annotations: List<KSAnnotation>): String {
         val relicStringJson = annotations.joinToString(prefix = "{\n", postfix = "\n}", separator = ",\n") { annotation ->
             with(annotation.arguments) {
                 """
-                |    "${this[INDEX_PREFIX].value}:${this[INDEX_NAME].value}": {
-                |        "NAME": "${this[INDEX_NAME].value}",
-                |        "FLAVOR": "${this[INDEX_FLAVOR].value}",
+                |    "${findArgument(NAME_PREFIX).value}:${findArgument(NAME_NAME).value}": {
+                |        "NAME": "${findArgument(NAME_NAME).value}",
+                |        "FLAVOR": "${findArgument(NAME_FLAVOR).value}",
                 |        "DESCRIPTIONS": [ 
-                |            ${(this[INDEX_DESCRIPTIONS].value as ArrayList<String>).joinToString(separator = ",", transform = { "\"$it\"" })}
+                |            ${(findArgument(NAME_DESCRIPTIONS).value as ArrayList<String>).joinToString(separator = ",", transform = { "\"$it\"" })}
                 |        ]
                 |    }
                 |""".trimMargin().trimEnd()
