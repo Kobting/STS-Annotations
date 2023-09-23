@@ -13,9 +13,9 @@ class PowerStringProcessor(
 ): StringProcessor(codeGenerator, logger, options) {
 
     companion object {
-        private val NAME_PREFIX = PowerString::class.java.declaredMethods[0].name
-        private val NAME_NAME = PowerString::class.java.declaredMethods[1].name
-        private val NAME_DESCRIPTIONS = PowerString::class.java.declaredMethods[2].name
+        private val NAME_PREFIX = "prefix"
+        private val NAME_NAME = "name"
+        private val NAME_DESCRIPTIONS = "descriptions"
     }
 
     override val fileName: String = FileName.POWER_STRINGS.fileName

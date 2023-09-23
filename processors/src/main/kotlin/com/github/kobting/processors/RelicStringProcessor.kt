@@ -13,10 +13,10 @@ class RelicStringProcessor(
 ) : StringProcessor(codeGenerator, logger, options) {
 
     companion object {
-        private val NAME_PREFIX = RelicString::class.java.declaredMethods[0].name
-        private val NAME_NAME = RelicString::class.java.declaredMethods[1].name
-        private val NAME_FLAVOR = RelicString::class.java.declaredMethods[2].name
-        private val NAME_DESCRIPTIONS = RelicString::class.java.declaredMethods[3].name
+        private const val NAME_PREFIX = "prefix"
+        private const val NAME_NAME = "name"
+        private const val NAME_FLAVOR = "flavor"
+        private const val NAME_DESCRIPTIONS = "descriptions"
     }
 
     override val fileName: String = FileName.RELIC_STRINGS.fileName

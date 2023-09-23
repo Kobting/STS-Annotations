@@ -49,11 +49,10 @@ abstract class StringProcessor(
         //For some reason when running while building cannot cast to Language to have to use hack findLanguage function
         //Casting to Language works once built into a JAR.
         val stringsMappedByLanguage = symbols.flatMap { it.annotations }.groupBy {
-            val argumentIndex = it.findArgumentIndex(languageArgumentName)
             try {
-                (it.arguments[argumentIndex].value as Language).abbreviation
+                (it.arguments.findArgument(languageArgumentName).value as Language).abbreviation
             } catch (ex: ClassCastException) {
-                findLanguage(it.arguments[argumentIndex].value.toString())
+                findLanguage(it.arguments.findArgument(languageArgumentName).value.toString())
             }
         }
 

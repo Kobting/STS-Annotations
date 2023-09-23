@@ -14,12 +14,12 @@ class CardStringProcessor(
 ): StringProcessor(codeGenerator, logger, options) {
 
     companion object {
-        private val NAME_PREFIX = CardString::class.java.declaredMethods[0].name
-        private val NAME_NAME = CardString::class.java.declaredMethods[1].name
-        private val NAME_DESCRIPTION = CardString::class.java.declaredMethods[2].name
-        private val NAME_UPGRADE_DESCRIPTION = CardString::class.java.declaredMethods[3].name
-        private val NAME_EXTENDED_DESCRIPTIONS = CardString::class.java.declaredMethods[4].name
-        private val NAME_LANGUAGE = CardString::class.java.declaredMethods[5].name
+        private const val NAME_PREFIX = "prefix"
+        private const val NAME_NAME = "name"
+        private const val NAME_DESCRIPTION = "description"
+        private const val NAME_UPGRADE_DESCRIPTION = "upgradeDescription"
+        private const val NAME_EXTENDED_DESCRIPTIONS = "extendedDescription"
+        private const val NAME_LANGUAGE = "language"
     }
 
     override val fileName: String = FileName.CARD_STRINGS.fileName
@@ -57,13 +57,18 @@ class CardStringProcessor(
 
     @Suppress("UNCHECKED_CAST")
     private fun List<KSValueArgument>.extendedDescriptionOrEmpty(): String {
-        val extendedDescription = findArgument(NAME_EXTENDED_DESCRIPTIONS).value as ArrayList<String>
+        val foundArgument = try { findArgument(NAME_EXTENDED_DESCRIPTIONS).value } catch (ex: Exception) { "" }
+        val extendedDescription = if (foundArgument is String) {
+            foundArgument
+        } else {
+            (foundArgument as ArrayList<String>).joinToString(separator = ",", transform = { "\"$it\"" })
+        }
         if (extendedDescription.isEmpty()) {
             return ""
         } else {
             return """
             |"EXTENDED_DESCRIPTION": [
-            |           ${extendedDescription.joinToString(separator = ",", transform = { "\"$it\"" })}
+            |           $extendedDescription
             |       ]
             """.trimMargin()
         }
