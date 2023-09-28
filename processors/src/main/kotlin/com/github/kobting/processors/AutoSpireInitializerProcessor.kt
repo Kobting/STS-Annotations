@@ -187,6 +187,10 @@ class AutoSpireInitializerProcessor(
             it.getAllSuperTypes().find { superType -> superType.declaration.qualifiedName?.asString() == AbstractCard::class.java.name } ?: error("${it.simpleName.asString()} must have have ${AbstractCard::class.java.name} in its parent types.")
             it.getConstructors().find { constructor -> constructor.parameters.isEmpty() } ?: error("${it.simpleName.asString()} must have a no args constructor to use ${Card::class.java.name}")
             methodReceiveEditCards.addStatement("basemod.BaseMod.addCard(${it.toClassName()}())")
+            val unlocked = it.annotations.filter { annotation -> annotation.shortName.getShortName() == Card::class.java.simpleName }.first().arguments.first().value as Boolean
+            if (unlocked) {
+                methodReceiveEditCards.addStatement("com.megacrit.cardcrawl.unlock.UnlockTracker.addCard(${it.toClassName()}().cardID)")
+            }
         }
 
         autoInitializerSpec.addFunction(methodReceiveEditCards.build())
