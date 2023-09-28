@@ -13,6 +13,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSValueArgument
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
+import com.squareup.kotlinpoet.ksp.toClassName
 
 abstract class StringProcessor(
     private val codeGenerator: CodeGenerator,
@@ -48,7 +49,9 @@ abstract class StringProcessor(
 
         //For some reason when running while building cannot cast to Language to have to use hack findLanguage function
         //Casting to Language works once built into a JAR.
-        val stringsMappedByLanguage = symbols.flatMap { it.annotations }.groupBy {
+        val stringsMappedByLanguage = symbols.flatMap { it.annotations }.filter {
+            it.annotationType.resolve().toClassName().canonicalName == annotationName
+        }.groupBy {
             try {
                 (it.arguments.findArgument(languageArgumentName).value as Language).abbreviation
             } catch (ex: ClassCastException) {
@@ -75,7 +78,7 @@ abstract class StringProcessor(
 
     //This is needed because argument order is not guaranteed to match parameter order of the annotation class
     fun List<KSValueArgument>.findArgument(argumentName: String): KSValueArgument {
-        return this.find { argumentName == it.name!!.getShortName() } ?: error("No argument named $argumentName")
+        return this.find { argumentName == it.name!!.getShortName() } ?: error("No argument named $argumentName for ${this.joinToString { it.name?.asString() ?: "null" }}")
     }
 
 

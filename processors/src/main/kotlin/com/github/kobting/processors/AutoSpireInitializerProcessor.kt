@@ -1,9 +1,13 @@
 package com.github.kobting.processors
 
+import basemod.interfaces.EditCardsSubscriber
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer
 import com.github.kobting.annotations.AutoSpireInitializer
+import com.github.kobting.annotations.Card
 import com.github.kobting.annotations.data.FileName
 import com.github.kobting.annotations.data.Language
+import com.google.devtools.ksp.getAllSuperTypes
+import com.google.devtools.ksp.getConstructors
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -13,6 +17,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
+import com.megacrit.cardcrawl.cards.AbstractCard
 import com.megacrit.cardcrawl.core.Settings.GameLanguage
 import com.megacrit.cardcrawl.localization.CardStrings
 import com.megacrit.cardcrawl.localization.PowerStrings
@@ -23,6 +28,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.addOriginatingKSFile
+import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.writeTo
 import java.io.File
 
@@ -47,11 +53,17 @@ class AutoSpireInitializerProcessor(
         if (symbols.first().annotations.find { it.shortName.getShortName() == SpireInitializer::class.java.simpleName } == null) throw IllegalStateException("Class annotated with ${AutoSpireInitializer::class.java.name} also needs to be annotated with ${SpireInitializer::class.java.name}")
         val target = symbols.first()
 
+        val cardSymbols = resolver
+            .getSymbolsWithAnnotation(Card::class.java.name)
+            .filterIsInstance<KSClassDeclaration>()
+
         val resourceBasePath = options[OPTION_RESOURCE_BASE_PATH]
 
         val fileSpec = FileSpec.builder(target.packageName.asString(), FILE_NAME)
 
         val autoInitializerTypeSpec = TypeSpec.classBuilder(CLASS_NAME).addOriginatingKSFile(target.containingFile!!).addModifiers(KModifier.OPEN)
+
+        processCardAnnotations(autoInitializerTypeSpec, cardSymbols)
 
         if (resourceBasePath != null) {
             val supportedLanguages = findSupportedLanguagesAndFileNames(resourceBasePath, codeGenerator.generatedFile.toList())
@@ -100,7 +112,7 @@ class AutoSpireInitializerProcessor(
         }
 
         try {
-            fileSpec.build().writeTo(codeGenerator, Dependencies(true, target.containingFile!!))
+            fileSpec.build().writeTo(codeGenerator, Dependencies(true, *(listOf(target.containingFile!!) + cardSymbols.map { it.containingFile }.toList()).filterNotNull().toTypedArray()))
         } catch (ex: FileAlreadyExistsException) {
             /* Ignoring Multi-pass */
         }
@@ -164,6 +176,20 @@ class AutoSpireInitializerProcessor(
         }.map { LanguageAndFileName(Language.valueOfOrError(it.parentFile.name), FileName.valueOfOrError(it.name.substringBeforeLast("."))) }.distinct().toList()
 
         return supportedLanguages
+    }
+
+    private fun processCardAnnotations(autoInitializerSpec: TypeSpec.Builder, cardSymbols: Sequence<KSClassDeclaration>) {
+        autoInitializerSpec.addSuperinterface(EditCardsSubscriber::class)
+
+        val methodReceiveEditCards = FunSpec.builder("receiveEditCards").addModifiers(KModifier.OVERRIDE)
+
+        cardSymbols.forEach {
+            it.getAllSuperTypes().find { superType -> superType.declaration.qualifiedName?.asString() == AbstractCard::class.java.name } ?: error("${it.simpleName.asString()} must have have ${AbstractCard::class.java.name} in its parent types.")
+            it.getConstructors().find { constructor -> constructor.parameters.isEmpty() } ?: error("${it.simpleName.asString()} must have a no args constructor to use ${Card::class.java.name}")
+            methodReceiveEditCards.addStatement("basemod.BaseMod.addCard(${it.toClassName()}())")
+        }
+
+        autoInitializerSpec.addFunction(methodReceiveEditCards.build())
     }
 
 }

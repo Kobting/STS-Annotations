@@ -1,3 +1,5 @@
+package com.github.kobting
+
 import com.github.kobting.annotations.RelicString
 import com.github.kobting.annotations.data.Language
 
