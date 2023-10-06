@@ -4,7 +4,8 @@ This project is aimed at adding annotations to remove the boilerplate code requi
 
 ## Adding to your project
 
-https://github.com/Kobting/STS-Annotations/wiki/Adding-to-your-project
+https://github.com/Kobting/STS-Annotations/wiki/Adding-to-your-project  
+Example project using this project (with gradle and kotlin): https://github.com/Kobting/STS-ThePain
 
 ## Building
 
