@@ -9,14 +9,9 @@ Example project using this project (with gradle and kotlin): https://github.com/
 
 ## Building
 
-This is currently setup with gradle and using my project [sts-dependencies](https://github.com/Kobting/sts-dependencies) for generating dependencies used in these gradle files. 
-You would have to pull that and build it to your maven local repository to build this project.
-Once that is done, and you run gradle sync it should generate a file called `stsdependencies.config` that needs 1 line of text that is
-the path to your installation of Steam.
+Update [sts-dependencies.dependencies.gradle.kts](https://github.com/Kobting/STS-Annotations/blob/main/buildSrc/src/main/kotlin/sts-dependencies.dependencies.gradle.kts) to point to your steam installation path. After that you should be able to build the project.
 
 ## Current features
-
-**Note: None of this has been tested yet**
 
 1. `@CardString` for auto generating the card strings file.  
     Example:
