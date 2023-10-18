@@ -7,10 +7,6 @@ This project is aimed at adding annotations to remove the boilerplate code requi
 https://github.com/Kobting/STS-Annotations/wiki/Adding-to-your-project  
 Example project using this project (with gradle and kotlin): https://github.com/Kobting/STS-ThePain
 
-## Building
-
-Update [sts-dependencies.dependencies.gradle.kts](https://github.com/Kobting/STS-Annotations/blob/main/buildSrc/src/main/kotlin/sts-dependencies.dependencies.gradle.kts) to point to your steam installation path. After that you should be able to build the project.
-
 ## Current features
 
 1. `@CardString` for auto generating the card strings file.  
@@ -60,5 +56,7 @@ Update [sts-dependencies.dependencies.gradle.kts](https://github.com/Kobting/STS
 https://github.com/Kobting/STS-Annotations/assets/40338395/7c9ecff6-300c-413f-bd3c-e226bdf81fb7
 
 
+## Building
 
+Update [sts-dependencies.dependencies.gradle.kts](https://github.com/Kobting/STS-Annotations/blob/main/buildSrc/src/main/kotlin/sts-dependencies.dependencies.gradle.kts) to point to your steam installation path. After that you should be able to build the project.
 
