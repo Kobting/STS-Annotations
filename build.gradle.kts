@@ -5,7 +5,7 @@ import java.util.*
 plugins {
     kotlin("jvm") version "1.7.22"
     id("com.google.devtools.ksp") version "1.7.22-1.0.8"
-    id("com.github.kobting")
+    id("sts-dependencies.dependencies")
 }
 
 group = "com.github.kobting"
@@ -17,9 +17,9 @@ repositories {
 
 dependencies {
     implementation(project(":annotations"))
-    implementation(project.ext.get("SlayTheSpire")!!)
-    implementation(project.ext.get("BaseMod")!!)
-    implementation(project.ext.get("ModTheSpire")!!)
+    implementation(ModTheSpire)
+    implementation(SlayTheSpire)
+    implementation(BaseMod)
     ksp(project(":processors"))
 }
 
