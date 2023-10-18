@@ -5,9 +5,6 @@ val steamPath = when(Platform.currentPlatform()) {
     Platform.LINUX -> "${System.getProperty("user.home")}/.steam/debian-installation/steamapps"
 }
 
-println("STS-Dependency-Configuration")
-println("SteamPath: $steamPath")
-
 val workshopLocation = "$steamPath/workshop/content/646570"
 val SlayTheSpire = files("$steamPath/common/SlayTheSpire/desktop-1.0.jar")
 val ModTheSpire = files("$workshopLocation/1605060445/ModTheSpire.jar")
