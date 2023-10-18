@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     maven
+    id("sts-dependencies.dependencies")
 }
 
 group = "com.github.kobting.sts-annotations"
@@ -14,7 +15,8 @@ repositories {
 }
 
 dependencies {
-
+    implementation(BaseMod)
+    implementation(SlayTheSpire)
 }
 
 tasks.withType<KotlinCompile> {

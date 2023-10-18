@@ -1,20 +1,20 @@
 package com.github.kobting.processors
 
 import basemod.interfaces.EditCardsSubscriber
+import basemod.interfaces.EditRelicsSubscriber
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer
 import com.github.kobting.annotations.AutoSpireInitializer
+import com.github.kobting.annotations.BaseRelic
 import com.github.kobting.annotations.Card
+import com.github.kobting.annotations.Relic
 import com.github.kobting.annotations.data.FileName
 import com.github.kobting.annotations.data.Language
 import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getConstructors
-import com.google.devtools.ksp.processing.CodeGenerator
-import com.google.devtools.ksp.processing.Dependencies
-import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.processing.Resolver
-import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
 import com.megacrit.cardcrawl.cards.AbstractCard
@@ -22,11 +22,8 @@ import com.megacrit.cardcrawl.core.Settings.GameLanguage
 import com.megacrit.cardcrawl.localization.CardStrings
 import com.megacrit.cardcrawl.localization.PowerStrings
 import com.megacrit.cardcrawl.localization.RelicStrings
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec
+import com.megacrit.cardcrawl.relics.AbstractRelic
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.addOriginatingKSFile
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.writeTo
@@ -57,6 +54,14 @@ class AutoSpireInitializerProcessor(
             .getSymbolsWithAnnotation(Card::class.java.name)
             .filterIsInstance<KSClassDeclaration>()
 
+        val relicSymbols = resolver
+            .getSymbolsWithAnnotation(Relic::class.java.name)
+            .filterIsInstance<KSClassDeclaration>()
+
+        val baseRelicSymbols = resolver
+            .getSymbolsWithAnnotation(BaseRelic::class.java.name)
+            .filterIsInstance<KSClassDeclaration>()
+
         val resourceBasePath = options[OPTION_RESOURCE_BASE_PATH]
 
         val fileSpec = FileSpec.builder(target.packageName.asString(), FILE_NAME)
@@ -64,6 +69,7 @@ class AutoSpireInitializerProcessor(
         val autoInitializerTypeSpec = TypeSpec.classBuilder(CLASS_NAME).addOriginatingKSFile(target.containingFile!!).addModifiers(KModifier.OPEN)
 
         processCardAnnotations(autoInitializerTypeSpec, cardSymbols)
+        processRelicAnnotations(autoInitializerTypeSpec, relicSymbols, baseRelicSymbols)
 
         if (resourceBasePath != null) {
             val supportedLanguages = findSupportedLanguagesAndFileNames(resourceBasePath, codeGenerator.generatedFile.toList())
@@ -194,6 +200,31 @@ class AutoSpireInitializerProcessor(
         }
 
         autoInitializerSpec.addFunction(methodReceiveEditCards.build())
+    }
+
+
+    private fun processRelicAnnotations(autoInitializerTypeSpec: TypeSpec.Builder, relicSymbols: Sequence<KSClassDeclaration>, baseRelicSymbols: Sequence<KSClassDeclaration>) {
+        autoInitializerTypeSpec.addSuperinterface(EditRelicsSubscriber::class)
+
+        val methodReceiveEditRelics = FunSpec.builder("receiveEditRelics").addModifiers(KModifier.OVERRIDE)
+
+        relicSymbols.forEach {
+            it.getAllSuperTypes().find { superType -> superType.declaration.qualifiedName?.asString() == AbstractRelic::class.java.name } ?: error("${it.simpleName.asString()} must have have ${AbstractRelic::class.java.name} in its parent types.")
+            it.getConstructors().find { constructor -> constructor.parameters.isEmpty() } ?: error("${it.simpleName.asString()} must have a no args constructor to use ${Relic::class.java.name}")
+
+            val cardColor = (it.annotations.find { annotation -> annotation.annotationType.resolve().toClassName().canonicalName == Relic::class.java.name }!!.arguments.findArgument("color").value as KSType).toClassName().canonicalName
+            methodReceiveEditRelics.addStatement("basemod.BaseMod.addRelicToCustomPool(${it.toClassName()}(), ${cardColor})")
+        }
+
+        baseRelicSymbols.forEach {
+            it.getAllSuperTypes().find { superType -> superType.declaration.qualifiedName?.asString() == AbstractRelic::class.java.name } ?: error("${it.simpleName.asString()} must have have ${AbstractRelic::class.java.name} in its parent types.")
+            it.getConstructors().find { constructor -> constructor.parameters.isEmpty() } ?: error("${it.simpleName.asString()} must have a no args constructor to use ${BaseRelic::class.java.name}")
+
+            val relicType = (it.annotations.find { annotation -> annotation.annotationType.resolve().toClassName().canonicalName == BaseRelic::class.java.name }!!.arguments.findArgument("type").value as KSType).toClassName().canonicalName
+            methodReceiveEditRelics.addStatement("basemod.BaseMod.addRelic(${it.toClassName()}(), ${relicType})")
+        }
+
+        autoInitializerTypeSpec.addFunction(methodReceiveEditRelics.build())
     }
 
 }
