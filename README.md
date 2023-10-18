@@ -29,7 +29,7 @@ Example project using this project (with gradle and kotlin): https://github.com/
     @RelicString(prefix = PREFIX, name = "relicOne", flavor = "relic One flavor. Spanish", descriptions = ["This is relic One! Spanish"], language = Language.SPANISH)
     class Relic()
     ```
-3. `@PowerString` for auto generating the power strings file
+3. `@PowerString` for auto generating the power strings file  
     Example:
     ```kotlin
     import com.github.kobting.annotations.PowerString
@@ -39,7 +39,23 @@ Example project using this project (with gradle and kotlin): https://github.com/
     @PowerString(prefix = PREFIX, name = "powerOne", descriptions = ["This is power One! Spanish"], language = Language.SPANISH)
     class Power1()
     ```
-4. `@AutoSpireInitializer` for generating a class that implements basemod subscribers. Currently only supports `EditStringsSubscriber` when there exists classes annotated with one of the String annotations.   
+4. `@Card` for auto generating the code to add the card using `BaseMod`  
+   Example:
+   ```kotlin
+   @Card()RelicType.BLUE
+   class Card1(): CustomCard(...)
+   @Card(unlocked = true)
+   class Card2(): CustomCard(...)
+   ```
+5. `@Relic` and `@BaseRelic` for auto generating the code to add the relic using `BaseMod`  
+   Example:
+   ```kotlin
+   @Relic(color = MyCustomCardColor)
+   class Relic1(): CustomRelic(...)
+   @BaseRelic(type = RelicType.BLUE)
+   class Relic2(): CustomRelic(...)
+   ```
+7. `@AutoSpireInitializer` for generating a class that implements basemod subscribers. Currently only supports `EditStringsSubscriber` when there exists classes annotated with one of the String annotations.   
     Example:
     ```kotlin
     import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer
