@@ -1,7 +1,8 @@
+val overridePath = properties["steamPath"] as? String?
 
 //Modify to match your system
-val steamPath = when(Platform.currentPlatform()) {
-    Platform.WINDOWS -> "D:/steam"
+val steamPath = overridePath.takeIf { !it.isNullOrEmpty() } ?: when(Platform.currentPlatform()) {
+    Platform.WINDOWS -> "D:/Steam/steamapps"
     Platform.LINUX -> "${System.getProperty("user.home")}/.steam/debian-installation/steamapps"
 }
 
@@ -33,4 +34,3 @@ enum class Platform {
 
     }
 }
-
